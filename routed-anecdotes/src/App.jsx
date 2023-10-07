@@ -1,5 +1,8 @@
-import { useState } from 'react'
-import { Routes, Route, Link, useMatch } from 'react-router-dom'
+import Notification from './Notification'
+import { useState, useEffect, useRef } from 'react'
+import { Routes, Route, Link, useMatch, useNavigate } from 'react-router-dom'
+
+const NOTIFICATION_TIME=5000;
 
 const Menu = () => {
   const padding = {
@@ -63,6 +66,8 @@ const CreateNew = (props) => {
   const [author, setAuthor] = useState('')
   const [info, setInfo] = useState('')
 
+  const navigate = useNavigate();
+
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -72,6 +77,8 @@ const CreateNew = (props) => {
       info,
       votes: 0
     })
+
+    navigate('/');
   }
 
   return (
@@ -115,11 +122,39 @@ const App = () => {
     }
   ])
 
-  const [notification, setNotification] = useState('')
+  const [notification, setNotification] = useState({ text:'',showUntil:Date.now() })
+  const timeoutIdRef = useRef(-1);
+
+  useEffect(() => {
+    if(timeoutIdRef.current>0){
+      clearTimeout(timeoutIdRef.current);
+      timeoutIdRef.current=-1;
+    }
+    if(notification.text){
+      timeoutIdRef.current = setTimeout(() => {
+        console.log(notification);
+        //reset notification if time has run out
+        if(notification.text && Date.now()>notification.showUntil){
+          setNotification({
+            text:'',
+            showUntil:0
+          })
+        }
+      }, NOTIFICATION_TIME+10)
+    }
+  }, [notification])
+
+  const showNotification = (text) => {
+    setNotification({
+      text:text,
+      showUntil:Date.now()+NOTIFICATION_TIME
+    })
+  }
 
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
+    showNotification(`created new anecdote '${anecdote.content}'`)
   }
 
   const anecdoteById = (id) =>
@@ -146,6 +181,7 @@ const App = () => {
     <div>
       <h1>Software anecdotes</h1>
       <Menu />
+      <Notification notification={notification}/>
       <Routes>
         <Route path='/anecdotes/:id' element={<Anecdote anecdote={anecdote}/>}/>
         <Route path='/about' element={<About />}/>
