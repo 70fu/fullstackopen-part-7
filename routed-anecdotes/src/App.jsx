@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route, Link, useMatch } from 'react-router-dom'
 
 const Menu = () => {
   const padding = {
@@ -14,11 +14,24 @@ const Menu = () => {
   )
 }
 
+const Anecdote = ({ anecdote }) => (
+  <div>
+    <h2>&apos;{anecdote.content}&apos; by {anecdote.author}</h2>
+    <p>has {anecdote.votes} {anecdote.votes === 1 ? 'vote' : 'votes'}</p>
+    <p>for more info see <a href={anecdote.info} target='_blank' rel="noreferrer">{anecdote.info}</a></p>
+  </div>
+)
+
+const AnecdoteListEntry = ({ anecdote }) => (
+  <Link to={`/anecdotes/${anecdote.id}`} ><li>{anecdote.content}</li></Link>
+)
+
 const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
+
     <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} >{anecdote.content}</li>)}
+      {anecdotes.map(anecdote => <AnecdoteListEntry key={anecdote.id} anecdote={anecdote}/>)}
     </ul>
   </div>
 )
@@ -123,21 +136,26 @@ const App = () => {
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
   }
 
+  //load anecdote from path parameter
+  const anecdoteMatch = useMatch('/anecdotes/:id');
+  const anecdote = anecdoteMatch
+    ? anecdotes.find((a) => a.id === Number(anecdoteMatch.params.id))
+    : null;
+
   return (
-    <Router>
-      <div>
-        <h1>Software anecdotes</h1>
-        <Menu />
-        <Routes>
-          <Route path='/about' element={<About />}/>
-          <Route path='/create' element={<CreateNew addNew={addNew} />}/>
-          <Route path='/' element={<AnecdoteList anecdotes={anecdotes} />}/>
-        </Routes>
-        <footer>
-          <Footer />
-        </footer>
-      </div>
-    </Router>
+    <div>
+      <h1>Software anecdotes</h1>
+      <Menu />
+      <Routes>
+        <Route path='/anecdotes/:id' element={<Anecdote anecdote={anecdote}/>}/>
+        <Route path='/about' element={<About />}/>
+        <Route path='/create' element={<CreateNew addNew={addNew} />}/>
+        <Route path='/' element={<AnecdoteList anecdotes={anecdotes} />}/>
+      </Routes>
+      <footer>
+        <Footer />
+      </footer>
+    </div>
   )
 }
 
