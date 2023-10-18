@@ -10,22 +10,26 @@
 //
 //
 // -- This is a parent command --
-Cypress.Commands.add('login', ({ username, password }) => {
-  cy.request('POST', `${Cypress.env('BACKEND')}/login`, { username, password })
-    .then(({ body }) => {
-      localStorage.setItem('loggedInBlogUser', JSON.stringify(body));
-      cy.visit('');
-    });
+Cypress.Commands.add("login", ({ username, password }) => {
+  cy.request("POST", `${Cypress.env("BACKEND")}/login`, {
+    username,
+    password,
+  }).then(({ body }) => {
+    localStorage.setItem("loggedInBlogUser", JSON.stringify(body));
+    cy.visit("");
+  });
 });
 
-Cypress.Commands.add('createBlog', (blog) => {
+Cypress.Commands.add("createBlog", (blog) => {
   cy.request({
-    url: `${Cypress.env('BACKEND')}/blogs`,
-    method: 'POST',
+    url: `${Cypress.env("BACKEND")}/blogs`,
+    method: "POST",
     body: blog,
     headers: {
-      'Authorization': `Bearer ${JSON.parse(localStorage.getItem('loggedInBlogUser')).token}`
-    }
+      Authorization: `Bearer ${
+        JSON.parse(localStorage.getItem("loggedInBlogUser")).token
+      }`,
+    },
   });
 });
 //

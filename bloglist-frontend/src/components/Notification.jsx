@@ -1,20 +1,16 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 const Notification = ({ message, typeClass }) => {
   if (message === null) {
-    return null
+    return null;
   }
 
-  return (
-    <div className={`notification ${typeClass}`}>
-      {message}
-    </div>
-  )
-}
+  return <div className={`notification ${typeClass}`}>{message}</div>;
+};
 
 Notification.propTypes = {
-  message:PropTypes.string.isRequired,
-  typeClass:PropTypes.string.isRequired
-}
+  message: PropTypes.string.isRequired,
+  typeClass: PropTypes.string.isRequired,
+};
 
-export default Notification
+export default Notification;
