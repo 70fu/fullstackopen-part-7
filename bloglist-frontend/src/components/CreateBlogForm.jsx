@@ -1,5 +1,10 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
+import {
+  showErrorNotification,
+  showSuccessNotification,
+} from "../reducers/notificationReducer";
 
 const FormText = ({ name, value, setValue }) => {
   return (
@@ -23,7 +28,8 @@ FormText.propTypes = {
   setValue: PropTypes.func.isRequired,
 };
 
-const CreateBlogForm = ({ addBlog, pushSuccess, pushError }) => {
+const CreateBlogForm = ({ addBlog }) => {
+  const dispatch = useDispatch();
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
@@ -33,7 +39,7 @@ const CreateBlogForm = ({ addBlog, pushSuccess, pushError }) => {
 
     //don't even try sending a post request, if one of the fields is empty and inform the user
     if (!title || !author || !url) {
-      pushError("please input title, author and url");
+      dispatch(showErrorNotification("please input title, author and url"));
       return;
     }
 
@@ -45,7 +51,9 @@ const CreateBlogForm = ({ addBlog, pushSuccess, pushError }) => {
 
     addBlog(blog);
 
-    pushSuccess(`added a new blog "${title}" by "${author}"`);
+    dispatch(
+      showSuccessNotification(`added a new blog "${title}" by "${author}"`),
+    );
 
     setTitle("");
     setAuthor("");
@@ -66,8 +74,6 @@ const CreateBlogForm = ({ addBlog, pushSuccess, pushError }) => {
 
 CreateBlogForm.propTypes = {
   addBlog: PropTypes.func.isRequired,
-  pushSuccess: PropTypes.func.isRequired,
-  pushError: PropTypes.func.isRequired,
 };
 
 export default CreateBlogForm;

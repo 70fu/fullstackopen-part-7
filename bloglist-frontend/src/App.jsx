@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Blog from "./components/Blog";
 import CreateBlogForm from "./components/CreateBlogForm";
 import LoginForm from "./components/LoginForm";
@@ -6,16 +7,20 @@ import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
+import {
+  showSuccessNotification,
+  showErrorNotification,
+} from "./reducers/notificationReducer";
 
 const userStorageKey = "loggedInBlogUser";
-let notificationTimeoutId = null;
 
 const App = () => {
+  const dispatch = useDispatch();
+  const notifications = useSelector((state) => state.notifications);
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [notifications, setNotifications] = useState([]);
 
   const createBlogFormToggleRef = useRef();
 
@@ -34,59 +39,6 @@ const App = () => {
       blogService.setUser(user);
     }
   }, []);
-
-  useEffect(() => {
-    if (notifications.length !== 0) {
-      notificationTimeoutId = setTimeout(
-        updateNotifications,
-        notifications[0].showUntil.getTime() - Date.now() + 10,
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [notifications]);
-
-  const cancelNotificationTimeout = () => {
-    if (notificationTimeoutId) {
-      clearTimeout(notificationTimeoutId);
-      notificationTimeoutId = null;
-    }
-  };
-
-  const updateNotifications = () => {
-    //find first active notification
-    const now = new Date();
-    const firstActiveIndex = notifications.findIndex(
-      (notification) => now <= notification.showUntil,
-    );
-    if (firstActiveIndex === -1) {
-      setNotifications([]);
-    } else {
-      setNotifications(notifications.slice(firstActiveIndex));
-    }
-    cancelNotificationTimeout();
-  };
-
-  const NOTIFICATION_TIME = 5000;
-
-  const pushError = (text) => {
-    pushNotification(text, "error");
-  };
-
-  const pushSuccess = (text) => {
-    pushNotification(text, "success");
-  };
-
-  const pushNotification = (text, className) => {
-    const notification = {
-      text: text,
-      showUntil: new Date(Date.now() + NOTIFICATION_TIME),
-      className: className,
-    };
-
-    console.log("Adding notification", notification);
-    setNotifications(notifications.concat(notification));
-    cancelNotificationTimeout();
-  };
 
   const addBlog = async (newBlog) => {
     const created = await blogService.create(newBlog);
@@ -120,14 +72,14 @@ const App = () => {
         setUsername("");
         setPassword("");
 
-        pushSuccess("Successfully logged in");
+        dispatch(showSuccessNotification("Successfully logged in"));
       } else {
         console.log("login unsuccessful");
-        pushError("Login unsuccessful");
+        dispatch(showErrorNotification("Login unsuccessful"));
       }
     } catch (error) {
       console.log(error);
-      pushError("wrong username or password");
+      dispatch(showErrorNotification("wrong username or password"));
     }
   };
 
@@ -139,7 +91,7 @@ const App = () => {
     setUser(null);
 
     console.log("logged out");
-    pushSuccess("Successfully logged out");
+    dispatch(showSuccessNotification("Successfully logged out"));
   };
 
   const generateNotifications = () => {
@@ -181,11 +133,7 @@ const App = () => {
       </div>
       <Togglable buttonLabel="new blog" ref={createBlogFormToggleRef}>
         <h2>create new</h2>
-        <CreateBlogForm
-          addBlog={addBlog}
-          pushError={pushError}
-          pushSuccess={pushSuccess}
-        />
+        <CreateBlogForm addBlog={addBlog} />
       </Togglable>
       {blogs
         .toSorted((a, b) => b.likes - a.likes)
