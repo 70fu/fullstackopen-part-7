@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import PropTypes from "prop-types";
+import blogService from "../services/blogs";
 import {
   showErrorNotification,
   showSuccessNotification,
@@ -28,8 +30,15 @@ FormText.propTypes = {
   setValue: PropTypes.func.isRequired,
 };
 
-const CreateBlogForm = ({ addBlog }) => {
+const CreateBlogForm = () => {
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+  const createBlogMutation = useMutation({
+    mutationFn: blogService.create,
+    onSuccess: (newBlog) => {
+      queryClient.setQueryData(["blogs"], (old) => [...old, newBlog]);
+    },
+  });
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
@@ -49,7 +58,7 @@ const CreateBlogForm = ({ addBlog }) => {
       url: url,
     };
 
-    addBlog(blog);
+    createBlogMutation.mutate(blog);
 
     dispatch(
       showSuccessNotification(`added a new blog "${title}" by "${author}"`),
@@ -70,10 +79,6 @@ const CreateBlogForm = ({ addBlog }) => {
       </button>
     </form>
   );
-};
-
-CreateBlogForm.propTypes = {
-  addBlog: PropTypes.func.isRequired,
 };
 
 export default CreateBlogForm;

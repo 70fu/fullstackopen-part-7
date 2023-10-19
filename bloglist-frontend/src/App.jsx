@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useQuery } from "@tanstack/react-query";
 import Blog from "./components/Blog";
 import CreateBlogForm from "./components/CreateBlogForm";
 import LoginForm from "./components/LoginForm";
@@ -17,19 +18,17 @@ const userStorageKey = "loggedInBlogUser";
 const App = () => {
   const dispatch = useDispatch();
   const notifications = useSelector((state) => state.notifications);
-  const [blogs, setBlogs] = useState([]);
+  const blogResult = useQuery({
+    queryKey: ["blogs"],
+    queryFn: blogService.getAll,
+    refetchOnWindowFocus: false,
+  });
+  const blogs = blogResult.data;
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
 
   const createBlogFormToggleRef = useRef();
-
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      setBlogs(await blogService.getAll());
-    };
-    fetchBlogs();
-  }, []);
 
   useEffect(() => {
     const userString = window.localStorage.getItem(userStorageKey);
@@ -40,23 +39,17 @@ const App = () => {
     }
   }, []);
 
-  const addBlog = async (newBlog) => {
-    const created = await blogService.create(newBlog);
-    createBlogFormToggleRef.current.toggleVisibility();
-    setBlogs(blogs.concat(created));
-  };
-
   const handleBlogUpdate = async (changed) => {
     const updated = await blogService.update(changed);
     const newBlogList = blogs.map((blog) =>
       blog.id === updated.id ? updated : blog,
     );
-    setBlogs(newBlogList);
+    //setBlogs(newBlogList);
   };
 
   const handleBlogRemove = async (removed) => {
     await blogService.remove(removed);
-    setBlogs(blogs.filter((blog) => blog.id !== removed.id));
+    //setBlogs(blogs.filter((blog) => blog.id !== removed.id));
   };
 
   const handleLogin = async (target) => {
@@ -133,19 +126,23 @@ const App = () => {
       </div>
       <Togglable buttonLabel="new blog" ref={createBlogFormToggleRef}>
         <h2>create new</h2>
-        <CreateBlogForm addBlog={addBlog} />
+        <CreateBlogForm />
       </Togglable>
-      {blogs
-        .toSorted((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            showDelete={user.username === blog.user.username}
-            handleBlogUpdate={handleBlogUpdate}
-            handleBlogRemove={handleBlogRemove}
-          />
-        ))}
+      {blogResult.isLoading ? (
+        <div>Loading blogs...</div>
+      ) : (
+        blogs
+          .toSorted((a, b) => b.likes - a.likes)
+          .map((blog) => (
+            <Blog
+              key={blog.id}
+              blog={blog}
+              showDelete={user.username === blog.user.username}
+              handleBlogUpdate={handleBlogUpdate}
+              handleBlogRemove={handleBlogRemove}
+            />
+          ))
+      )}
     </div>
   );
 };

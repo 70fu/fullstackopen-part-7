@@ -17,36 +17,29 @@ const getConfig = () => {
   return config;
 };
 
-const getAll = async () => {
-  const response = await axios.get(baseUrl);
-  return response.data;
+const getAll = () => {
+  return axios.get(baseUrl).then((response) => response.data);
 };
 
-const create = async (blog) => {
-  const response = await axios.post(
-    baseUrl,
-    { ...blog, user: loggedInUser.id },
-    getConfig(),
-  );
-  return response.data;
+const create = (blog) => {
+  return axios
+    .post(baseUrl, { ...blog, user: loggedInUser.id }, getConfig())
+    .then((response) => response.data);
 };
 
-const update = async (blog) => {
+const update = (blog) => {
   let requestBody = { ...blog };
   if (blog.user.id) {
     requestBody.user = blog.user.id;
   }
 
-  const response = await axios.put(
-    `${baseUrl}/${blog.id}`,
-    requestBody,
-    getConfig(),
-  );
-  return response.data;
+  return axios
+    .put(`${baseUrl}/${blog.id}`, requestBody, getConfig())
+    .then((response) => response.data);
 };
 
-const remove = async (blog) => {
-  await axios.delete(`${baseUrl}/${blog.id}`, getConfig());
+const remove = (blog) => {
+  return axios.delete(`${baseUrl}/${blog.id}`, getConfig());
 };
 
 export default { getAll, create, setUser, update, remove };
