@@ -3,9 +3,10 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import blogService from "../services/blogs";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
+import { useLoggedInUser } from "../hooks";
 
 const Blog = ({ blog, showDelete }) => {
-  const user = useSelector((state) => state.loggedUser);
+  const user = useLoggedInUser();
   const queryClient = useQueryClient();
   const updateMutation = useMutation({
     mutationFn: (updatedBlog) => {

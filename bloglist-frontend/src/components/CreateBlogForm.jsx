@@ -7,6 +7,7 @@ import {
   showErrorNotification,
   showSuccessNotification,
 } from "../reducers/notificationReducer";
+import { useLoggedInUser } from "../hooks";
 
 const FormText = ({ name, value, setValue }) => {
   return (
@@ -31,7 +32,7 @@ FormText.propTypes = {
 };
 
 const CreateBlogForm = () => {
-  const user = useSelector((state) => state.loggedUser);
+  const user = useLoggedInUser();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const createBlogMutation = useMutation({

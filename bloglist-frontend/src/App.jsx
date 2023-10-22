@@ -13,6 +13,7 @@ import {
   showErrorNotification,
 } from "./reducers/notificationReducer";
 import { loadFromStorage, logout } from "./reducers/loggedUserReducer";
+import { useLoggedInUser } from "./hooks";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -23,7 +24,7 @@ const App = () => {
     refetchOnWindowFocus: false,
   });
   const blogs = blogResult.data;
-  const user = useSelector((state) => state.loggedUser);
+  const user = useLoggedInUser();
 
   const createBlogFormToggleRef = useRef();
 
