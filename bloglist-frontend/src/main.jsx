@@ -5,10 +5,12 @@ import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import notificationReducer from "./reducers/notificationReducer";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import loggedUserReducer from "./reducers/loggedUserReducer";
 
 const store = configureStore({
   reducer: {
     notifications: notificationReducer,
+    loggedUser: loggedUserReducer,
   },
 });
 

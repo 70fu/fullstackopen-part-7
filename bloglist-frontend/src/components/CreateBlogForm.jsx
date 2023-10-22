@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import PropTypes from "prop-types";
 import blogService from "../services/blogs";
@@ -31,10 +31,13 @@ FormText.propTypes = {
 };
 
 const CreateBlogForm = () => {
+  const user = useSelector((state) => state.loggedUser);
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const createBlogMutation = useMutation({
-    mutationFn: blogService.create,
+    mutationFn: (newBlog) => {
+      return blogService.create(newBlog, user);
+    },
     onSuccess: (newBlog) => {
       queryClient.setQueryData(["blogs"], (old) => [...old, newBlog]);
     },

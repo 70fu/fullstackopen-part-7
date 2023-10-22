@@ -2,21 +2,25 @@ import { useState } from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import blogService from "../services/blogs";
 import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
 
 const Blog = ({ blog, showDelete }) => {
+  const user = useSelector((state) => state.loggedUser);
   const queryClient = useQueryClient();
   const updateMutation = useMutation({
-    mutationFn: blogService.update,
+    mutationFn: (updatedBlog) => {
+      return blogService.update(updatedBlog, user);
+    },
     onSuccess: (data) => {
-      console.log(data);
-      console.log(blog);
       queryClient.setQueryData(["blogs"], (old) =>
         old.map((b) => (b.id === blog.id ? data : b)),
       );
     },
   });
   const removeMutation = useMutation({
-    mutationFn: blogService.remove,
+    mutationFn: (blogToDelete) => {
+      return blogService.remove(blogToDelete, user);
+    },
     onSuccess: () => {
       queryClient.setQueryData(["blogs"], (old) =>
         old.filter((b) => b.id !== blog.id),

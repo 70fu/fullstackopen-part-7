@@ -12,8 +12,7 @@ import {
   showSuccessNotification,
   showErrorNotification,
 } from "./reducers/notificationReducer";
-
-const userStorageKey = "loggedInBlogUser";
+import { loadFromStorage, logout } from "./reducers/loggedUserReducer";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -24,67 +23,17 @@ const App = () => {
     refetchOnWindowFocus: false,
   });
   const blogs = blogResult.data;
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
+  const user = useSelector((state) => state.loggedUser);
 
   const createBlogFormToggleRef = useRef();
 
   useEffect(() => {
-    const userString = window.localStorage.getItem(userStorageKey);
-    if (userString) {
-      const user = JSON.parse(userString);
-      setUser(user);
-      blogService.setUser(user);
-    }
-  }, []);
-
-  const handleBlogUpdate = async (changed) => {
-    const updated = await blogService.update(changed);
-    const newBlogList = blogs.map((blog) =>
-      blog.id === updated.id ? updated : blog,
-    );
-    //setBlogs(newBlogList);
-  };
-
-  const handleBlogRemove = async (removed) => {
-    await blogService.remove(removed);
-    //setBlogs(blogs.filter((blog) => blog.id !== removed.id));
-  };
-
-  const handleLogin = async (target) => {
-    target.preventDefault();
-    try {
-      const token = await loginService.login(username, password);
-      if (token) {
-        console.log("login successful");
-        window.localStorage.setItem(userStorageKey, JSON.stringify(token));
-        setUser(token);
-        blogService.setUser(token);
-
-        setUsername("");
-        setPassword("");
-
-        dispatch(showSuccessNotification("Successfully logged in"));
-      } else {
-        console.log("login unsuccessful");
-        dispatch(showErrorNotification("Login unsuccessful"));
-      }
-    } catch (error) {
-      console.log(error);
-      dispatch(showErrorNotification("wrong username or password"));
-    }
-  };
+    dispatch(loadFromStorage());
+  }, [dispatch]);
 
   const handleLogout = async (target) => {
-    console.log("logging out");
-
     target.preventDefault();
-    window.localStorage.removeItem(userStorageKey);
-    setUser(null);
-
-    console.log("logged out");
-    dispatch(showSuccessNotification("Successfully logged out"));
+    dispatch(logout());
   };
 
   const generateNotifications = () => {
@@ -106,13 +55,7 @@ const App = () => {
       <div>
         {generateNotifications()}
         <h2>Log in to the application</h2>
-        <LoginForm
-          username={username}
-          password={password}
-          setUsername={setUsername}
-          setPassword={setPassword}
-          handleLogin={handleLogin}
-        />
+        <LoginForm />
       </div>
     );
   }
@@ -138,8 +81,6 @@ const App = () => {
               key={blog.id}
               blog={blog}
               showDelete={user.username === blog.user.username}
-              handleBlogUpdate={handleBlogUpdate}
-              handleBlogRemove={handleBlogRemove}
             />
           ))
       )}
