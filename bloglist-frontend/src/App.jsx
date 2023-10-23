@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
+import UsersView from "./components/UsersView";
 import Blog from "./components/Blog";
 import CreateBlogForm from "./components/CreateBlogForm";
 import LoginForm from "./components/LoginForm";
@@ -14,10 +15,16 @@ import {
 } from "./reducers/notificationReducer";
 import { loadFromStorage, logout } from "./reducers/loggedUserReducer";
 import { useLoggedInUser } from "./hooks";
+import {
+  Routes,
+  Route,
+  Link,
+  useMatch,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
 
-const App = () => {
-  const dispatch = useDispatch();
-  const notifications = useSelector((state) => state.notifications);
+const BlogListView = () => {
   const blogResult = useQuery({
     queryKey: ["blogs"],
     queryFn: blogService.getAll,
@@ -27,47 +34,17 @@ const App = () => {
   const user = useLoggedInUser();
 
   const createBlogFormToggleRef = useRef();
-
-  useEffect(() => {
-    dispatch(loadFromStorage());
-  }, [dispatch]);
-
-  const handleLogout = async (target) => {
-    target.preventDefault();
-    dispatch(logout());
-  };
-
-  const generateNotifications = () => {
-    return (
-      <div>
-        {notifications.map((n) => (
-          <Notification
-            key={+n.showUntil}
-            message={n.text}
-            typeClass={n.className}
-          />
-        ))}
-      </div>
-    );
-  };
-
   if (user === null) {
     return (
       <div>
-        {generateNotifications()}
-        <h2>Log in to the application</h2>
-        <LoginForm />
+        <h2>blogs</h2>
+        <p>Please log in to view blogs.</p>
       </div>
     );
   }
-
   return (
-    <div>
-      {generateNotifications()}
+    <>
       <h2>blogs</h2>
-      <div>
-        {user.name} logged in <button onClick={handleLogout}>logout</button>
-      </div>
       <Togglable buttonLabel="new blog" ref={createBlogFormToggleRef}>
         <h2>create new</h2>
         <CreateBlogForm />
@@ -85,6 +62,64 @@ const App = () => {
             />
           ))
       )}
+    </>
+  );
+};
+
+const UserLogin = () => {
+  const dispatch = useDispatch();
+  const user = useLoggedInUser();
+  const handleLogout = async (target) => {
+    target.preventDefault();
+    dispatch(logout());
+  };
+  return (
+    <>
+      {user === null ? (
+        <div>
+          <h2>Log in to the application</h2>
+          <LoginForm />
+        </div>
+      ) : (
+        <div>
+          {user.name} logged in <button onClick={handleLogout}>logout</button>
+        </div>
+      )}
+    </>
+  );
+};
+
+const App = () => {
+  const dispatch = useDispatch();
+  const notifications = useSelector((state) => state.notifications);
+
+  useEffect(() => {
+    dispatch(loadFromStorage());
+  }, [dispatch]);
+
+  const generateNotifications = () => {
+    return (
+      <div>
+        {notifications.map((n) => (
+          <Notification
+            key={+n.showUntil}
+            message={n.text}
+            typeClass={n.className}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      {generateNotifications()}
+      <UserLogin />
+      <Routes>
+        <Route path="/users" element={<UsersView />} />
+        <Route path="/" element={<BlogListView />} />
+        <Route path="*" element={<Navigate replace to="/" />} />
+      </Routes>
     </div>
   );
 };

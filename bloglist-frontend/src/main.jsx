@@ -6,6 +6,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import notificationReducer from "./reducers/notificationReducer";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import loggedUserReducer from "./reducers/loggedUserReducer";
+import { BrowserRouter as Router } from "react-router-dom";
 
 const store = configureStore({
   reducer: {
@@ -19,7 +20,9 @@ const client = new QueryClient();
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <QueryClientProvider client={client}>
-      <App />
+      <Router>
+        <App />
+      </Router>
     </QueryClientProvider>
   </Provider>,
 );
