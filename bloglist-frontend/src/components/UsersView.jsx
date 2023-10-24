@@ -41,7 +41,11 @@ const UsersView = () => {
             .toSorted((a, b) => b.blogs.length - a.blogs.length)
             .map((user) => (
               <tr key={user.id}>
-                <td>{user.name}</td>
+                <td>
+                  <a href={`/users/${user.id}`} rel="noreferrer">
+                    {user.name}
+                  </a>
+                </td>
                 <td>{user.blogs.length}</td>
               </tr>
             ))}

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 import UsersView from "./components/UsersView";
+import UserView from "./components/User";
 import Blog from "./components/Blog";
 import CreateBlogForm from "./components/CreateBlogForm";
 import LoginForm from "./components/LoginForm";
@@ -97,6 +98,8 @@ const App = () => {
     dispatch(loadFromStorage());
   }, [dispatch]);
 
+  const userMatch = useMatch("/users/:id");
+
   const generateNotifications = () => {
     return (
       <div>
@@ -116,6 +119,7 @@ const App = () => {
       {generateNotifications()}
       <UserLogin />
       <Routes>
+        <Route path="/users/:userId" Component={UserView} />
         <Route path="/users" element={<UsersView />} />
         <Route path="/" element={<BlogListView />} />
         <Route path="*" element={<Navigate replace to="/" />} />
