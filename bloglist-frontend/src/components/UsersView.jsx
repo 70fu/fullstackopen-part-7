@@ -42,9 +42,9 @@ const UsersView = () => {
             .map((user) => (
               <tr key={user.id}>
                 <td>
-                  <a href={`/users/${user.id}`} rel="noreferrer">
+                  <Link to={`/users/${user.id}`} state={{ user: user }}>
                     {user.name}
-                  </a>
+                  </Link>
                 </td>
                 <td>{user.blogs.length}</td>
               </tr>
