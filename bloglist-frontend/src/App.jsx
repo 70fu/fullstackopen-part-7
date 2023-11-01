@@ -25,6 +25,35 @@ import {
   Navigate,
 } from "react-router-dom";
 
+const Menu = () => {
+  const padding = {
+    paddingRight: 5,
+  };
+  const dispatch = useDispatch();
+  const user = useLoggedInUser();
+  const handleLogout = async (target) => {
+    target.preventDefault();
+    dispatch(logout());
+  };
+  return (
+    <div className="menu">
+      <Link to="/" style={padding}>
+        blogs
+      </Link>
+      <Link to="/users" style={padding}>
+        users
+      </Link>
+      {user === null ? (
+        <>Not logged in</>
+      ) : (
+        <>
+          {user.name} logged in <button onClick={handleLogout}>logout</button>
+        </>
+      )}
+    </div>
+  );
+};
+
 const BlogListView = () => {
   const blogResult = useQuery({
     queryKey: ["blogs"],
@@ -59,26 +88,16 @@ const BlogListView = () => {
 };
 
 const UserLogin = () => {
-  const dispatch = useDispatch();
   const user = useLoggedInUser();
-  const handleLogout = async (target) => {
-    target.preventDefault();
-    dispatch(logout());
-  };
-  return (
-    <>
-      {user === null ? (
-        <div>
-          <h2>Log in to the application</h2>
-          <LoginForm />
-        </div>
-      ) : (
-        <div>
-          {user.name} logged in <button onClick={handleLogout}>logout</button>
-        </div>
-      )}
-    </>
-  );
+  if (user === null) {
+    return (
+      <div>
+        <h2>Log in to the application</h2>
+        <LoginForm />
+      </div>
+    );
+  }
+  return <></>;
 };
 
 const App = () => {
@@ -88,8 +107,6 @@ const App = () => {
   useEffect(() => {
     dispatch(loadFromStorage());
   }, [dispatch]);
-
-  const userMatch = useMatch("/users/:id");
 
   const generateNotifications = () => {
     return (
@@ -107,6 +124,7 @@ const App = () => {
 
   return (
     <div>
+      <Menu />
       {generateNotifications()}
       <UserLogin />
       <Routes>

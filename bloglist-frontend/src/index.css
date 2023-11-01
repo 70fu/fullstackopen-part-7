@@ -6,6 +6,10 @@
   color: green;
 }
 
+.menu {
+  background: lightgray;
+}
+
 .notification {
   background: lightgrey;
   font-size: 20px;
