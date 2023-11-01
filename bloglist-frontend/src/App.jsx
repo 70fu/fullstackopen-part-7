@@ -32,17 +32,8 @@ const BlogListView = () => {
     refetchOnWindowFocus: false,
   });
   const blogs = blogResult.data;
-  const user = useLoggedInUser();
 
   const createBlogFormToggleRef = useRef();
-  if (user === null) {
-    return (
-      <div>
-        <h2>blogs</h2>
-        <p>Please log in to view blogs.</p>
-      </div>
-    );
-  }
   return (
     <>
       <h2>blogs</h2>
@@ -56,11 +47,11 @@ const BlogListView = () => {
         blogs
           .toSorted((a, b) => b.likes - a.likes)
           .map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              showDelete={user.username === blog.user.username}
-            />
+            <div className="blog" key={blog.id}>
+              <Link to={`/blogs/${blog.id}`} state={{ blog }}>
+                {blog.title} {blog.author}
+              </Link>
+            </div>
           ))
       )}
     </>
@@ -119,7 +110,8 @@ const App = () => {
       {generateNotifications()}
       <UserLogin />
       <Routes>
-        <Route path="/users/:userId" Component={UserView} />
+        <Route path="/blogs/:blogId" element={<Blog />} />
+        <Route path="/users/:userId" element={<UserView />} />
         <Route path="/users" element={<UsersView />} />
         <Route path="/" element={<BlogListView />} />
         <Route path="*" element={<Navigate replace to="/" />} />

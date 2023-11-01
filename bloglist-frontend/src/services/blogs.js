@@ -36,4 +36,8 @@ const remove = (blog, loggedInUser) => {
   return axios.delete(`${baseUrl}/${blog.id}`, getConfig(loggedInUser));
 };
 
-export default { getAll, create, update, remove };
+const get = (id) => {
+  return axios.get(`${baseUrl}/${id}`).then((response) => response.data);
+};
+
+export default { getAll, create, update, remove, get };
