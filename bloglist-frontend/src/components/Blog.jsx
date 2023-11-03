@@ -82,6 +82,12 @@ const Blog = () => {
           <button onClick={handleRemove}>remove</button>
         </>
       )}
+      <h3>comments</h3>
+      <ul>
+        {blog.comments.map((comment) => (
+          <li key={comment.comment}>{comment.comment}</li>
+        ))}
+      </ul>
     </div>
   );
 };
