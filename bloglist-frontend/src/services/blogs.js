@@ -40,4 +40,10 @@ const get = (id) => {
   return axios.get(`${baseUrl}/${id}`).then((response) => response.data);
 };
 
-export default { getAll, create, update, remove, get };
+const postComment = (id, comment) => {
+  return axios
+    .post(`${baseUrl}/${id}/comments`, { comment: comment })
+    .then((response) => response.data);
+};
+
+export default { getAll, create, update, remove, get, postComment };

@@ -7,6 +7,7 @@ import { useLoggedInUser } from "../hooks";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 const Blog = () => {
+  const [comment, setComment] = useState("");
   const user = useLoggedInUser();
   const { blogId } = useParams();
   const historyState = useLocation().state;
@@ -19,19 +20,27 @@ const Blog = () => {
   const blog = blogResult.data;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const updateBlogDataCache = (data) => {
+    //update queries with this specific id
+    queryClient.setQueryData(["blogs", data.id], data);
+
+    //update list cache
+    queryClient.setQueryData(["blogs"], (old) =>
+      old.map((b) => (b.id === blog.id ? data : b)),
+    );
+  };
   const updateMutation = useMutation({
     mutationFn: (updatedBlog) => {
       return blogService.update(updatedBlog, user);
     },
-    onSuccess: (data) => {
-      //update queries with this specific id
-      queryClient.setQueryData(["blogs", data.id], data);
-
-      //update list cache
-      queryClient.setQueryData(["blogs"], (old) =>
-        old.map((b) => (b.id === blog.id ? data : b)),
-      );
+    onSuccess: updateBlogDataCache,
+  });
+  const postCommentMutation = useMutation({
+    mutationFn: (comment) => {
+      return blogService.postComment(blog.id, comment);
     },
+    onSuccess: updateBlogDataCache,
   });
   const removeMutation = useMutation({
     mutationFn: (blogToDelete) => {
@@ -55,6 +64,15 @@ const Blog = () => {
     console.log("Remove button pressed for blog", blog);
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
       removeMutation.mutate(blog);
+    }
+  };
+
+  const handlePostComment = (e) => {
+    e.preventDefault();
+    if (comment) {
+      console.log("Post comment", comment);
+      postCommentMutation.mutate(comment);
+      setComment("");
     }
   };
 
@@ -83,6 +101,15 @@ const Blog = () => {
         </>
       )}
       <h3>comments</h3>
+      <form onSubmit={handlePostComment}>
+        <input
+          type="text"
+          value={comment}
+          name="comment"
+          onChange={({ target }) => setComment(target.value)}
+        />
+        <button type="submit">add comment</button>
+      </form>
       <ul>
         {blog.comments.map((comment) => (
           <li key={comment.comment}>{comment.comment}</li>
