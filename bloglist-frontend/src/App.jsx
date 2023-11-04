@@ -8,6 +8,7 @@ import CreateBlogForm from "./components/CreateBlogForm";
 import LoginForm from "./components/LoginForm";
 import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
+import Menu from "./components/Header";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import {
@@ -24,35 +25,7 @@ import {
   useNavigate,
   Navigate,
 } from "react-router-dom";
-
-const Menu = () => {
-  const padding = {
-    paddingRight: 5,
-  };
-  const dispatch = useDispatch();
-  const user = useLoggedInUser();
-  const handleLogout = async (target) => {
-    target.preventDefault();
-    dispatch(logout());
-  };
-  return (
-    <div className="menu">
-      <Link to="/" style={padding}>
-        blogs
-      </Link>
-      <Link to="/users" style={padding}>
-        users
-      </Link>
-      {user === null ? (
-        <>Not logged in</>
-      ) : (
-        <>
-          {user.name} logged in <button onClick={handleLogout}>logout</button>
-        </>
-      )}
-    </div>
-  );
-};
+import { Container } from "@mantine/core";
 
 const BlogListView = () => {
   const blogResult = useQuery({
@@ -126,14 +99,16 @@ const App = () => {
     <div>
       <Menu />
       {generateNotifications()}
-      <UserLogin />
-      <Routes>
-        <Route path="/blogs/:blogId" element={<Blog />} />
-        <Route path="/users/:userId" element={<UserView />} />
-        <Route path="/users" element={<UsersView />} />
-        <Route path="/" element={<BlogListView />} />
-        <Route path="*" element={<Navigate replace to="/" />} />
-      </Routes>
+      <Container>
+        <UserLogin />
+        <Routes>
+          <Route path="/blogs/:blogId" element={<Blog />} />
+          <Route path="/users/:userId" element={<UserView />} />
+          <Route path="/users" element={<UsersView />} />
+          <Route path="/" element={<BlogListView />} />
+          <Route path="*" element={<Navigate replace to="/" />} />
+        </Routes>
+      </Container>
     </div>
   );
 };
