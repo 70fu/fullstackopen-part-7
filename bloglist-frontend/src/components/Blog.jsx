@@ -5,6 +5,21 @@ import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { useLoggedInUser } from "../hooks";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  Loader,
+  Pill,
+  Button,
+  Group,
+  Text,
+  Title,
+  Box,
+  Divider,
+  Textarea,
+  List,
+  Paper,
+} from "@mantine/core";
+import { IconHeartFilled } from "@tabler/icons-react";
+import classes from "./Blog.module.css";
 
 const Blog = () => {
   const [comment, setComment] = useState("");
@@ -77,45 +92,83 @@ const Blog = () => {
   };
 
   if (blogResult.isLoading || (!blog && !historyState)) {
-    return <h2>Loading blog data...</h2>;
+    return (
+      <div>
+        <h2>Loading blog data...</h2>
+        <Loader color="blue" />
+      </div>
+    );
   }
 
   const showDelete = user && blog.user.username === user.username;
 
   return (
-    <div>
-      <h2>
-        {blog.title} - {blog.author}{" "}
-      </h2>
-      <a href={blog.url} target="_blank" rel="noreferrer">
-        {blog.url}
-      </a>{" "}
+    <Box>
+      <Box className={classes.blog}>
+        <Title order={3}>
+          {blog.title} - {blog.author}{" "}
+        </Title>
+        <Group justify="space-between">
+          <Text>
+            added by{" "}
+            <Text span fs="italic">
+              {blog.user.name}
+            </Text>
+          </Text>
+          <Group>
+            {user && (
+              <Button
+                onClick={handleLike}
+                color="red"
+                size="compact-sm"
+                variant="default"
+                leftSection={<IconHeartFilled className={classes.heartIcon} />}
+                rightSection={<Pill>{blog.likes}</Pill>}
+              >
+                Like
+              </Button>
+            )}
+            {showDelete && (
+              <Button
+                variant="filled"
+                color="red"
+                size="compact-sm"
+                onClick={handleRemove}
+              >
+                Remove
+              </Button>
+            )}
+          </Group>
+        </Group>
+        <a href={blog.url} target="_blank" rel="noreferrer">
+          {blog.url}
+        </a>{" "}
+      </Box>
       <br />
-      likes {blog.likes} {user && <button onClick={handleLike}>like</button>}{" "}
-      <br />
-      added by {blog.user.name}
-      {showDelete && (
-        <>
-          <br />
-          <button onClick={handleRemove}>remove</button>
-        </>
-      )}
-      <h3>comments</h3>
-      <form onSubmit={handlePostComment}>
-        <input
-          type="text"
-          value={comment}
-          name="comment"
-          onChange={({ target }) => setComment(target.value)}
-        />
-        <button type="submit">add comment</button>
-      </form>
-      <ul>
+      <Divider my="lg" />
+      <Title order={4}>comments</Title>
+      <Box maw="24rem">
+        <form onSubmit={handlePostComment}>
+          <Textarea
+            type="text"
+            value={comment}
+            name="comment"
+            onChange={({ target }) => setComment(target.value)}
+            my="xs"
+          />
+          <Button type="submit">add comment</Button>
+        </form>
+      </Box>
+      <List spacing="xs" mt="xs" icon={<></>}>
         {blog.comments.map((comment) => (
-          <li key={comment.comment}>{comment.comment}</li>
+          <List.Item key={comment.comment}>
+            <Paper p="xs" shadow="xs" withBorder>
+              {comment.comment}
+            </Paper>
+          </List.Item>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Box>
   );
 };
 

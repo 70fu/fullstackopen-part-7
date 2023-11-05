@@ -1,0 +1,10 @@
+.blogContainer {
+  display: grid;
+  gap: var(--mantine-spacing-sm);
+  flex-wrap: wrap;
+  margin-top: var(--mantine-spacing-sm);
+}
+
+.blog {
+  padding: var(--mantine-spacing-sm);
+}

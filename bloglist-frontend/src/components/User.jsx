@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import userService from "../services/users";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, Link } from "react-router-dom";
+import { Box, List, Loader } from "@mantine/core";
 const UserView = () => {
   const { userId } = useParams();
   const historyState = useLocation().state;
@@ -14,19 +15,26 @@ const UserView = () => {
 
   if (userResult.isLoading || (!user && !historyState)) {
     console.log("loading user");
-    return <h2>Loading user data...</h2>;
+    return (
+      <Box>
+        <h2>Loading user data...</h2>
+        <Loader color="blue" />
+      </Box>
+    );
   }
 
   return (
-    <div>
+    <Box>
       <h2>{user.name}</h2>
       <h3>added blogs</h3>
-      <ul>
+      <List>
         {user.blogs.map((blog) => (
-          <li key={blog.id}>{blog.title}</li>
+          <List.Item key={blog.id}>
+            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+          </List.Item>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Box>
   );
 };
 

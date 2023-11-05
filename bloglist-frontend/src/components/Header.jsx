@@ -2,7 +2,7 @@ import { loadFromStorage, logout } from "../reducers/loggedUserReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { useLoggedInUser } from "../hooks";
 import { Link, useMatch } from "react-router-dom";
-import { Group, Container } from "@mantine/core";
+import { Group, Container, Button, Text } from "@mantine/core";
 import classes from "./Header.module.css";
 
 const Menu = () => {
@@ -40,8 +40,17 @@ const Menu = () => {
             <>Not logged in</>
           ) : (
             <>
-              {user.name} logged in{" "}
-              <button onClick={handleLogout}>logout</button>
+              <Text fs="italic" span>
+                {user.name}
+              </Text>{" "}
+              logged in{" "}
+              <Button
+                variant="default"
+                size="compact-sm"
+                onClick={handleLogout}
+              >
+                logout
+              </Button>
             </>
           )}
         </div>

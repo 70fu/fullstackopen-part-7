@@ -8,6 +8,7 @@ import {
   useNavigate,
   Navigate,
 } from "react-router-dom";
+import { Loader, Table } from "@mantine/core";
 
 const UsersView = () => {
   const userResult = useQuery({
@@ -21,7 +22,7 @@ const UsersView = () => {
     return (
       <>
         <h2>Users</h2>
-        <p>Loading user data...</p>
+        <Loader color="blue" />
       </>
     );
   }
@@ -29,28 +30,28 @@ const UsersView = () => {
   return (
     <>
       <h2>Users</h2>
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>blogs created</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table maw="32rem">
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th></Table.Th>
+            <Table.Th>blogs created</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
           {users
             .toSorted((a, b) => b.blogs.length - a.blogs.length)
             .map((user) => (
-              <tr key={user.id}>
-                <td>
+              <Table.Tr key={user.id}>
+                <Table.Td>
                   <Link to={`/users/${user.id}`} state={{ user: user }}>
                     {user.name}
                   </Link>
-                </td>
+                </Table.Td>
                 <td>{user.blogs.length}</td>
-              </tr>
+              </Table.Tr>
             ))}
-        </tbody>
-      </table>
+        </Table.Tbody>
+      </Table>
     </>
   );
 };

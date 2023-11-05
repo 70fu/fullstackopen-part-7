@@ -1,20 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useQuery } from "@tanstack/react-query";
 import UsersView from "./components/UsersView";
 import UserView from "./components/User";
 import Blog from "./components/Blog";
-import CreateBlogForm from "./components/CreateBlogForm";
 import LoginForm from "./components/LoginForm";
 import Notification from "./components/Notification";
-import Togglable from "./components/Togglable";
+import BlogListView from "./components/BlogListView";
 import Menu from "./components/Header";
-import blogService from "./services/blogs";
-import loginService from "./services/login";
-import {
-  showSuccessNotification,
-  showErrorNotification,
-} from "./reducers/notificationReducer";
 import { loadFromStorage, logout } from "./reducers/loggedUserReducer";
 import { useLoggedInUser } from "./hooks";
 import {
@@ -25,40 +17,7 @@ import {
   useNavigate,
   Navigate,
 } from "react-router-dom";
-import { Container } from "@mantine/core";
-
-const BlogListView = () => {
-  const blogResult = useQuery({
-    queryKey: ["blogs"],
-    queryFn: blogService.getAll,
-    refetchOnWindowFocus: false,
-  });
-  const blogs = blogResult.data;
-
-  const createBlogFormToggleRef = useRef();
-  return (
-    <>
-      <h2>blogs</h2>
-      <Togglable buttonLabel="new blog" ref={createBlogFormToggleRef}>
-        <h2>create new</h2>
-        <CreateBlogForm />
-      </Togglable>
-      {blogResult.isLoading ? (
-        <div>Loading blogs...</div>
-      ) : (
-        blogs
-          .toSorted((a, b) => b.likes - a.likes)
-          .map((blog) => (
-            <div className="blog" key={blog.id}>
-              <Link to={`/blogs/${blog.id}`} state={{ blog }}>
-                {blog.title} {blog.author}
-              </Link>
-            </div>
-          ))
-      )}
-    </>
-  );
-};
+import { Collapse, Container, Group, Loader, Button } from "@mantine/core";
 
 const UserLogin = () => {
   const user = useLoggedInUser();

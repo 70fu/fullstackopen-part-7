@@ -8,6 +8,7 @@ import {
   showSuccessNotification,
 } from "../reducers/notificationReducer";
 import { useLoggedInUser } from "../hooks";
+import { Button, Fieldset, TextInput, Container, Box } from "@mantine/core";
 
 const FormText = ({ name, value, setValue }) => {
   return (
@@ -74,14 +75,28 @@ const CreateBlogForm = () => {
   };
 
   return (
-    <form onSubmit={handleBlogCreate}>
-      <FormText name="title:" value={title} setValue={setTitle} />
-      <FormText name="author:" value={author} setValue={setAuthor} />
-      <FormText name="url:" value={url} setValue={setUrl} />
-      <button id="create-blog-button" type="submit">
-        create
-      </button>
-    </form>
+    <Box maw="32rem">
+      <Fieldset legend="New Blog">
+        <form onSubmit={handleBlogCreate}>
+          <TextInput
+            label="Title"
+            value={title}
+            onChange={(e) => setTitle(e.currentTarget.value)}
+          />
+          <TextInput
+            label="Author"
+            value={author}
+            onChange={(e) => setAuthor(e.currentTarget.value)}
+          />
+          <TextInput
+            label="URL"
+            value={url}
+            onChange={(e) => setUrl(e.currentTarget.value)}
+          />
+          <Button type="submit">create</Button>
+        </form>
+      </Fieldset>
+    </Box>
   );
 };
 
