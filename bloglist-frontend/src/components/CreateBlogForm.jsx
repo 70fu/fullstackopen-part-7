@@ -3,10 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import PropTypes from "prop-types";
 import blogService from "../services/blogs";
-import {
-  showErrorNotification,
-  showSuccessNotification,
-} from "../reducers/notificationReducer";
+import { notifications } from "@mantine/notifications";
 import { useLoggedInUser } from "../hooks";
 import { Button, Fieldset, TextInput, Container, Box } from "@mantine/core";
 
@@ -53,7 +50,11 @@ const CreateBlogForm = () => {
 
     //don't even try sending a post request, if one of the fields is empty and inform the user
     if (!title || !author || !url) {
-      dispatch(showErrorNotification("please input title, author and url"));
+      notifications.show({
+        color: "red",
+        title: "Error",
+        message: "please input title, author and url",
+      });
       return;
     }
 
@@ -65,9 +66,10 @@ const CreateBlogForm = () => {
 
     createBlogMutation.mutate(blog);
 
-    dispatch(
-      showSuccessNotification(`added a new blog "${title}" by "${author}"`),
-    );
+    notifications.show({
+      title: "Blog added",
+      message: `added a new blog "${title}" by "${author}"`,
+    });
 
     setTitle("");
     setAuthor("");

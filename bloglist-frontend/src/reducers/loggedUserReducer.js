@@ -1,9 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import loginService from "../services/login";
-import {
-  showSuccessNotification,
-  showErrorNotification,
-} from "./notificationReducer";
+import { notifications } from "@mantine/notifications";
 
 const userStorageKey = "loggedInBlogUser";
 
@@ -44,17 +41,28 @@ export function login(username, password) {
         window.localStorage.setItem(userStorageKey, JSON.stringify(token));
 
         //show notification
-        dispatch(showSuccessNotification("Successfully logged in"));
+        notifications.show({
+          title: "Login",
+          message: "Successfully logged in",
+        });
 
         //store user token in store
         dispatch(setUserToken(token));
       } else {
         console.log("login unsuccessful");
-        dispatch(showErrorNotification("Login unsuccessful"));
+        notifications.show({
+          color: "red",
+          title: "Error",
+          message: "Login unsuccessful",
+        });
       }
     } catch (error) {
       console.log(error);
-      dispatch(showErrorNotification("wrong username or password"));
+      notifications.show({
+        color: "red",
+        title: "Error",
+        message: "wrong username or password",
+      });
     }
   };
 }
@@ -66,7 +74,10 @@ export function logout() {
     dispatch(clearUserToken());
 
     console.log("logged out");
-    dispatch(showSuccessNotification("Successfully logged out"));
+    notifications.show({
+      title: "Logout",
+      message: "Successfully logged out",
+    });
   };
 }
 

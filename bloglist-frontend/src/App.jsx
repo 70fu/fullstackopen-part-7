@@ -4,7 +4,6 @@ import UsersView from "./components/UsersView";
 import UserView from "./components/User";
 import Blog from "./components/Blog";
 import LoginForm from "./components/LoginForm";
-import Notification from "./components/Notification";
 import BlogListView from "./components/BlogListView";
 import Menu from "./components/Header";
 import { loadFromStorage, logout } from "./reducers/loggedUserReducer";
@@ -34,30 +33,14 @@ const UserLogin = () => {
 
 const App = () => {
   const dispatch = useDispatch();
-  const notifications = useSelector((state) => state.notifications);
 
   useEffect(() => {
     dispatch(loadFromStorage());
   }, [dispatch]);
 
-  const generateNotifications = () => {
-    return (
-      <div>
-        {notifications.map((n) => (
-          <Notification
-            key={+n.showUntil}
-            message={n.text}
-            typeClass={n.className}
-          />
-        ))}
-      </div>
-    );
-  };
-
   return (
     <div>
       <Menu />
-      {generateNotifications()}
       <Container>
         <UserLogin />
         <Routes>
